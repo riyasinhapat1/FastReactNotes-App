@@ -1,28 +1,42 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+const API_BASE = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+
 function App() {
   const [notes, setNotes] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  // Fetch all notes
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/notes").then((res) => setNotes(res.data));
+    axios
+      .get(`${API_BASE}/api/notes`)
+      .then((res) => setNotes(res.data))
+      .catch((err) => console.error("Error fetching notes:", err));
   }, []);
 
+  // Add a new note
   const addNote = () => {
     const newNote = { id: Date.now(), title, content };
-    axios.post("http://127.0.0.1:8000/notes", newNote).then((res) => {
-      setNotes([...notes, res.data]);
-      setTitle("");
-      setContent("");
-    });
+    axios
+      .post(`${API_BASE}/api/notes`, newNote)
+      .then((res) => {
+        setNotes([...notes, res.data]);
+        setTitle("");
+        setContent("");
+      })
+      .catch((err) => console.error("Error adding note:", err));
   };
 
+  // Delete a note
   const deleteNote = (id) => {
-    axios.delete(`http://127.0.0.1:8000/notes/${id}`).then(() => {
-      setNotes(notes.filter((n) => n.id !== id));
-    });
+    axios
+      .delete(`${API_BASE}/api/notes/${id}`)
+      .then(() => {
+        setNotes(notes.filter((n) => n.id !== id));
+      })
+      .catch((err) => console.error("Error deleting note:", err));
   };
 
   return (
